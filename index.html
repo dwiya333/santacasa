@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de QR Codes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="content">
+        <h1>Painel de QR Codes</h1>
+        <h2>Adicionar Cliente</h2>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <input id="clientCodeName" placeholder="Código e Nome" type="text" style="flex: 2; min-width: 220px;">
+            <input id="clientLink" placeholder="Link do Mapa" type="url" style="flex: 1; min-width: 220px;">
+        </div>
+        <button id="addClientButton" onclick="addClient()">Adicionar Cliente</button>
+        <button onclick="clearEdit()" type="button">Cancelar Edição</button>
+        <div id="clientsList"></div>
+
+        <h3>Lista de Códigos</h3>
+        <textarea id="codesList" readonly placeholder="Códigos separados por vírgula"></textarea>
+        <button onclick="copyCodes()">Copiar Códigos</button>
+
+        <h2>Gerar QR Codes</h2>
+        <button onclick="generateQRs()">Gerar QR Codes para Todos os Clientes</button>
+        <button onclick="printPage()">Imprimir QR Codes</button>
+        <input id="filter" placeholder="Filtrar por nome do cliente" oninput="filterQRs()" type="text">
+        <div id="qrs"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
