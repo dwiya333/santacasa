@@ -10,7 +10,7 @@ function addClient() {
     }
     const parts = codeName.split(' - ');
     if (parts.length < 2) {
-        alert('Formato inv�lido. Use: C�digo - Nome');
+        alert('Formato inválido. Use: Código - Nome');
         return;
     }
     const code = parts[0].trim();
@@ -63,7 +63,7 @@ function printPage() {
 function copyCodes() {
     const codes = document.getElementById('codesList').value;
     navigator.clipboard.writeText(codes).then(() => {
-        alert('C�digos copiados para a �rea de transfer�ncia!');
+        alert('Códigos copiados para a área de transferência!');
     }).catch(err => {
         alert('Erro ao copiar: ' + err);
     });
@@ -103,7 +103,8 @@ function generateQRs() {
         container.setAttribute('data-name', client.name);
         container.innerHTML = `<p><strong>${client.name}</strong><br>${client.code}</p>`;
         const img = document.createElement('img');
-        img.src = `https://qrcode.tec-it.com/API/QRCode?size=128&data=${encodeURIComponent(client.link)}`;
+        img.crossOrigin = 'anonymous';
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=128x128&data=${encodeURIComponent(client.link)}`;
         img.alt = `QR Code para ${client.name}`;
         container.appendChild(img);
         page.appendChild(container);
@@ -117,4 +118,51 @@ function filterQRs() {
         const name = item.getAttribute('data-name').toLowerCase();
         item.style.display = name.includes(filterValue) ? 'block' : 'none';
     });
+    
+}
+function downloadAllQRs() {
+    const items = document.querySelectorAll('.qr-item');
+
+    if (items.length === 0) {
+        alert('Clique em "Gerar QR Codes" primeiro antes de baixar.');
+        return;
+    }
+
+    let started = false;
+    items.forEach(item => {
+        const img = item.querySelector('img');
+        const name = item.getAttribute('data-name') || '';
+        const firstName = name.trim().split(' ')[0] || 'Cliente';
+        const pText = item.querySelector('p') ? item.querySelector('p').innerText : '';
+        const code = pText.split('\n').pop().trim();
+        const fileName = `qrcode, loc - ${firstName} ${code}.jpeg`;
+
+        if (!img || !img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) {
+            console.warn('Imagem não carregada:', fileName);
+            return;
+        }
+
+        try {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+            const link = document.createElement('a');
+            link.style.display = 'none';
+            link.href = dataUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            started = true;
+        } catch (err) {
+            console.error('Erro ao gerar download do QR code:', fileName, err);
+        }
+    });
+
+    if (!started) {
+        alert('Não foi possível iniciar nenhum download. Antes de baixar, gere os QR codes e aguarde o carregamento das imagens.');
+    }
 }
